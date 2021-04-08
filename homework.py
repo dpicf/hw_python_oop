@@ -2,15 +2,13 @@ import datetime as dt
 
 
 class Record:
-    def __init__(self, amount, comment, date=dt.datetime.now().date()):
+    def __init__(self, amount, comment, date=None):
         self.amount = amount
         self.comment = comment
-
-        if type(date) == str:
-            date_format = '%d.%m.%Y'
-            self.date = dt.datetime.strptime(date, date_format).date()
+        if date is None:
+            self.date = dt.date.today()
         else:
-            self.date = date
+            self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
 
     def __eq__(self, other):
         return (self.amount == other.amount
@@ -19,11 +17,10 @@ class Record:
 
 
 class Calculator:
-    records = []
-    today = dt.datetime.now().date()
-
     def __init__(self, limit):
         self.limit = limit
+        self.records = []
+        self.today = dt.date.today()
 
     def add_record(self, record_obj):
         if record_obj not in self.records:
@@ -34,16 +31,14 @@ class Calculator:
         for rec in self.records:
             if rec.date == self.today:
                 today_amount += rec.amount
-
         return today_amount
 
     def get_week_stats(self):
-        seven_day = self.today - dt.timedelta(days=7)
+        week_ago = self.today - dt.timedelta(days=7)
         week_amount = 0
         for rec in self.records:
-            if self.today > rec.date >= seven_day:
+            if self.today >= rec.date >= week_ago:
                 week_amount += rec.amount
-
         return week_amount
 
 
@@ -69,10 +64,10 @@ class CashCalculator(Calculator):
             message = 'На сегодня осталось '
             rubles_for_answer = self.limit - rubles_amount
         elif rubles_amount > self.limit:
-            message = 'денег нет, держись: твой долг - '
+            message = 'Денег нет, держись: твой долг - '
             rubles_for_answer = rubles_amount - self.limit
         else:
-            return 'денег нет, держись'
+            return 'Денег нет, держись'
 
         if currency == 'eur':
             eur = rubles_for_answer / self.EURO_RATE

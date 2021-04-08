@@ -1,26 +1,33 @@
-import pandas as pd
+import datetime as dt
 
 
 class Record:
-    def __init__(self, amount, comment, date=pd.to_datetime('today').date()):
+    def __init__(self, amount, comment, date=dt.datetime.now().date()):
         self.amount = amount
         self.comment = comment
 
         if type(date) == str:
-            self.date = pd.to_datetime(date).date()
+            date_format = '%d.%m.%Y'
+            self.date = dt.datetime.strptime(date, date_format).date()
         else:
             self.date = date
+
+    def __eq__(self, other):
+        return (self.amount == other.amount
+                and self.comment == other.comment
+                and self.date == other.date)
 
 
 class Calculator:
     records = []
-    today = pd.to_datetime('today').date()
+    today = dt.datetime.now().date()
 
     def __init__(self, limit):
         self.limit = limit
 
     def add_record(self, record_obj):
-        self.records.append(record_obj)
+        if record_obj not in self.records:
+            self.records.append(record_obj)
 
     def get_today_stats(self):
         today_amount = 0
@@ -31,10 +38,10 @@ class Calculator:
         return today_amount
 
     def get_week_stats(self):
-        date_list = pd.date_range(end=self.today, periods=7)
+        seven_day = self.today - dt.timedelta(days=7)
         week_amount = 0
         for rec in self.records:
-            if pd.Timestamp(rec.date) in date_list:
+            if self.today > rec.date >= seven_day:
                 week_amount += rec.amount
 
         return week_amount
@@ -45,15 +52,15 @@ class CaloriesCalculator(Calculator):
         calories_scored = super().get_today_stats()
         if calories_scored < self.limit:
             return ('Сегодня можно съесть что-нибудь ещё, но с общей '
-                    f'денегностью не более {self.limit - calories_scored} '
+                    f'калорийностью не более {self.limit - calories_scored} '
                     'кКал')
         else:
             return 'Хватит есть!'
 
 
 class CashCalculator(Calculator):
-    USD_RATE = 78
-    EURO_RATE = 92
+    USD_RATE = 78.0
+    EURO_RATE = 92.0
 
     def get_today_cash_remained(self, currency):
         rubles_amount = super().get_today_stats()

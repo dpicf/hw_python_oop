@@ -11,44 +11,31 @@ class Record:
         else:
             self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
 
-    def __eq__(self, other):
-        return (self.amount == other.amount
-                and self.comment == other.comment
-                and self.date == other.date)
-
 
 class Calculator:
     def __init__(self, limit: int):
         self.limit = limit
         self.records: list = []
-        self.today = dt.date.today()
 
-    def add_record(self, record_obj) -> None:
-        if record_obj not in self.records:
-            self.records.append(record_obj)
+    def add_record(self, record) -> None:
+        self.records.append(record)
 
     def get_today_stats(self) -> int:
-        today_amount: int = 0
-        for rec in self.records:
-            if rec.date == self.today:
-                today_amount += rec.amount
-        return today_amount
+        return sum(rec.amount for rec in self.records
+                   if rec.date == dt.date.today())
 
     def get_week_stats(self) -> int:
-        week_ago = self.today - dt.timedelta(days=7)
-        week_amount: int = 0
-        for rec in self.records:
-            if self.today >= rec.date >= week_ago:
-                week_amount += rec.amount
-        return week_amount
+        week_ago = dt.date.today() - dt.timedelta(days=7)
+        return sum(rec.amount for rec in self.records
+                   if dt.date.today() >= rec.date >= week_ago)
 
 
 class CaloriesCalculator(Calculator):
     def get_calories_remained(self) -> str:
-        calories_scored: int = super().get_today_stats()
-        if calories_scored < self.limit:
+        calories: int = self.get_today_stats()
+        if calories < self.limit:
             return ('Сегодня можно съесть что-нибудь ещё, но с общей '
-                    f'калорийностью не более {self.limit - calories_scored} '
+                    f'калорийностью не более {self.limit - calories} '
                     'кКал')
         else:
             return 'Хватит есть!'
@@ -57,25 +44,27 @@ class CaloriesCalculator(Calculator):
 class CashCalculator(Calculator):
     USD_RATE = 78.0
     EURO_RATE = 92.0
+    RUB_RATE = 1
 
     def get_today_cash_remained(self, currency: str) -> str:
-        rubles_amount: int = super().get_today_stats()
-        message: str = ''
-        rubles_for_answer: int = 0
-        if rubles_amount < self.limit:
-            message = 'На сегодня осталось '
-            rubles_for_answer = self.limit - rubles_amount
-        elif rubles_amount > self.limit:
-            message = 'Денег нет, держись: твой долг - '
-            rubles_for_answer = rubles_amount - self.limit
-        else:
+        money = self.limit - self.get_today_stats()
+
+        if money == 0:
             return 'Денег нет, держись'
 
-        if currency == 'eur':
-            eur: float = rubles_for_answer / self.EURO_RATE
-            return message + str(round(eur, 2)) + ' Euro'
-        elif currency == 'usd':
-            usd: float = rubles_for_answer / self.USD_RATE
-            return message + str(round(usd, 2)) + ' USD'
+        currencies = {'usd': ('USD', self.USD_RATE),
+                      'eur': ('Euro', self.EURO_RATE),
+                      'rub': ('руб', self.RUB_RATE)}
+
+        if currency not in currencies:
+            return 'Не знаю такую валюту:', currency
+
+        currency_out, rate = currencies[currency]
+        money_currency = money / rate
+
+        if money_currency > 0:
+            return ('На сегодня осталось {:.2f} {}'
+                    .format(money_currency, currency_out))
         else:
-            return message + str(rubles_for_answer) + ' руб'
+            return ('Денег нет, держись: твой долг - {:.2f} {}'
+                    .format(abs(money_currency), currency_out))

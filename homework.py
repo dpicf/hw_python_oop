@@ -53,8 +53,8 @@ class CashCalculator(Calculator):
             return 'Денег нет, держись'
 
         currencies: dict = {'usd': ('USD', self.USD_RATE),
-                      'eur': ('Euro', self.EURO_RATE),
-                      'rub': ('руб', self.RUB_RATE)}
+                            'eur': ('Euro', self.EURO_RATE),
+                            'rub': ('руб', self.RUB_RATE)}
 
         if currency not in currencies:
             return f'Не знаю такую валюту: {currency}'

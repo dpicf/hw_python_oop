@@ -17,7 +17,7 @@ class Calculator:
         self.limit = limit
         self.records: list = []
 
-    def add_record(self, record) -> None:
+    def add_record(self, record: object) -> None:
         self.records.append(record)
 
     def get_today_stats(self) -> int:
@@ -25,7 +25,7 @@ class Calculator:
                    if rec.date == dt.date.today())
 
     def get_week_stats(self) -> int:
-        week_ago = dt.date.today() - dt.timedelta(days=7)
+        week_ago: dt.date = dt.date.today() - dt.timedelta(days=7)
         return sum(rec.amount for rec in self.records
                    if dt.date.today() >= rec.date >= week_ago)
 
@@ -44,23 +44,25 @@ class CaloriesCalculator(Calculator):
 class CashCalculator(Calculator):
     USD_RATE = 78.0
     EURO_RATE = 92.0
-    RUB_RATE = 1
+    RUB_RATE = 1.0
 
     def get_today_cash_remained(self, currency: str) -> str:
-        money = self.limit - self.get_today_stats()
+        money: int = self.limit - self.get_today_stats()
 
         if money == 0:
             return 'Денег нет, держись'
 
-        currencies = {'usd': ('USD', self.USD_RATE),
+        currencies: dict = {'usd': ('USD', self.USD_RATE),
                       'eur': ('Euro', self.EURO_RATE),
                       'rub': ('руб', self.RUB_RATE)}
 
         if currency not in currencies:
-            return 'Не знаю такую валюту:', currency
+            return f'Не знаю такую валюту: {currency}'
 
+        currency_out: str
+        rate: float
         currency_out, rate = currencies[currency]
-        money_currency = money / rate
+        money_currency: float = money / rate
 
         if money_currency > 0:
             return ('На сегодня осталось {:.2f} {}'

@@ -97,7 +97,7 @@ class CashCalculator(Calculator):
             return 'Денег нет, держись'
 
         currencies: dict[str,
-                         tuple(str, float)] = {'usd': ('USD', self.USD_RATE),
+                         tuple[str, float]] = {'usd': ('USD', self.USD_RATE),
                                                'eur': ('Euro', self.EURO_RATE),
                                                'rub': ('руб', self.RUB_RATE)}
 

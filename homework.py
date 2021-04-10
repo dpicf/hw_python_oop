@@ -11,7 +11,8 @@ class Record:
     Класс Record создаёт объект со свойствами amount, comment, date.
     """
 
-    def __init__(self, amount: int, comment: str, date: Optional[str] = None):
+    def __init__(self, amount: int, comment: str,
+                 date: Optional[str] = None) -> None:
         self.amount = amount
         self.comment = comment
         if date is None:
@@ -22,15 +23,15 @@ class Record:
 
 class Calculator:
     """
-    Класс Calculator содержит методы add_record, get_today_stats,
+    Родительский класс Calculator содержит методы add_record, get_today_stats,
     get_week_stats. Содержит свойства limit и список объектов-записей records
     """
 
-    def __init__(self, limit: int):
+    def __init__(self, limit: int) -> None:
         self.limit = limit
-        self.records: list = []
+        self.records: list[Record] = []
 
-    def add_record(self, record: object) -> None:
+    def add_record(self, record: Record) -> None:
         """
         Метод add_record добавляет объекты к списку records
         """
@@ -69,8 +70,7 @@ class CaloriesCalculator(Calculator):
         calories: int = self.get_today_stats()
         if calories < self.limit:
             return ('Сегодня можно съесть что-нибудь ещё, но с общей '
-                    f'калорийностью не более {self.limit - calories} '
-                    'кКал')
+                    f'калорийностью не более {self.limit - calories} кКал')
         else:
             return 'Хватит есть!'
 
@@ -96,9 +96,10 @@ class CashCalculator(Calculator):
         if money == 0:
             return 'Денег нет, держись'
 
-        currencies: dict = {'usd': ('USD', self.USD_RATE),
-                            'eur': ('Euro', self.EURO_RATE),
-                            'rub': ('руб', self.RUB_RATE)}
+        currencies: dict[str,
+                         tuple(str, float)] = {'usd': ('USD', self.USD_RATE),
+                                               'eur': ('Euro', self.EURO_RATE),
+                                               'rub': ('руб', self.RUB_RATE)}
 
         if currency not in currencies:
             return f'Не знаю такую валюту: {currency}'
@@ -109,8 +110,7 @@ class CashCalculator(Calculator):
         money_currency: float = money / rate
 
         if money_currency > 0:
-            return ('На сегодня осталось {:.2f} {}'
-                    .format(money_currency, currency_out))
+            return f'На сегодня осталось {money_currency:.2f} {currency_out}'
         else:
-            return ('Денег нет, держись: твой долг - {:.2f} {}'
-                    .format(abs(money_currency), currency_out))
+            return ('Денег нет, держись: твой долг - '
+                    f'{abs(money_currency):.2f} {currency_out}')

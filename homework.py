@@ -114,5 +114,5 @@ class CashCalculator(Calculator):
                 return ('Денег нет, держись: твой долг - '
                         f'{abs(money_currency):.2f} {currency_out}')
 
-        except ValueError:
+        except KeyError:
             return f'Не знаю такую валюту: {currency}'

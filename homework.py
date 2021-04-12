@@ -108,7 +108,8 @@ class CashCalculator(Calculator):
             money_currency: float = money / rate
 
             if money_currency > 0:
-                return f'На сегодня осталось {money_currency:.2f} {currency_out}'
+                return (f'На сегодня осталось {money_currency:.2f} '
+                        f'{currency_out}')
             else:
                 return ('Денег нет, держись: твой долг - '
                         f'{abs(money_currency):.2f} {currency_out}')

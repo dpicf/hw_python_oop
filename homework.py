@@ -101,16 +101,17 @@ class CashCalculator(Calculator):
                                                'eur': ('Euro', self.EURO_RATE),
                                                'rub': ('руб', self.RUB_RATE)}
 
-        if currency not in currencies:
+        try:
+            currency_out: str
+            rate: float
+            currency_out, rate = currencies[currency]
+            money_currency: float = money / rate
+
+            if money_currency > 0:
+                return f'На сегодня осталось {money_currency:.2f} {currency_out}'
+            else:
+                return ('Денег нет, держись: твой долг - '
+                        f'{abs(money_currency):.2f} {currency_out}')
+
+        except ValueError:
             return f'Не знаю такую валюту: {currency}'
-
-        currency_out: str
-        rate: float
-        currency_out, rate = currencies[currency]
-        money_currency: float = money / rate
-
-        if money_currency > 0:
-            return f'На сегодня осталось {money_currency:.2f} {currency_out}'
-        else:
-            return ('Денег нет, держись: твой долг - '
-                    f'{abs(money_currency):.2f} {currency_out}')

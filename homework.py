@@ -3,7 +3,7 @@
 CashCalculator. Данные классы нужны для подсчета расходов и доходов.
 """
 import datetime as dt
-from typing import Optional
+from typing import Optional, Union
 
 
 class Record:
@@ -11,7 +11,9 @@ class Record:
     Класс Record создаёт объект со свойствами amount, comment, date.
     """
 
-    def __init__(self, amount: int, comment: str,
+    def __init__(self,
+                 amount: Union[int, float],
+                 comment: str,
                  date: Optional[str] = None) -> None:
         self.amount = amount
         self.comment = comment
@@ -27,7 +29,7 @@ class Calculator:
     get_week_stats. Содержит свойства limit и список объектов-записей records
     """
 
-    def __init__(self, limit: int) -> None:
+    def __init__(self, limit: Union[int, float]) -> None:
         self.limit = limit
         self.records: list[Record] = []
 
@@ -116,3 +118,12 @@ class CashCalculator(Calculator):
 
         except KeyError:
             return f'Не знаю такую валюту: {currency}'
+
+
+# cash_calculator = CashCalculator(1000)
+# cash_calculator.add_record(Record(amount=145, comment="кофе"))
+# cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
+# cash_calculator.add_record(Record(amount=3000,
+#                                   comment="бар в Танин др",
+#                                   date="08.11.2019"))
+# print(cash_calculator.get_today_cash_remained("dfhd"))

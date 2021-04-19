@@ -52,7 +52,7 @@ class Calculator:
         Метод get_week_stats возвращает сумму набранных калорий
         или потраченных денег за прошедшую неделю.
         """
-        week_ago: dt.date = dt.date.today() - dt.timedelta(days=7)
+        week_ago: dt.date = dt.date.today() - dt.timedelta(days=6)
         return sum(rec.amount for rec in self.records
                    if dt.date.today() >= rec.date >= week_ago)
 
@@ -126,4 +126,4 @@ class CashCalculator(Calculator):
 # cash_calculator.add_record(Record(amount=3000,
 #                                   comment="бар в Танин др",
 #                                   date="08.11.2019"))
-# print(cash_calculator.get_today_cash_remained("dfhd"))
+# print(cash_calculator.get_today_cash_remained("rub"))
